@@ -38,7 +38,7 @@ This ROS Python node (`drive_arc`) enables **manual and autonomous steering and 
 ---
 
 ## 🕹️ Joystick Mapping
-
+![Joystick Layout](controller_image.png)
 | Action                        | Button/Axis            | Description                                  |
 |------------------------------|------------------------|----------------------------------------------|
 | Mode up/down                 | `RB` / `LB`            | Increase/decrease drive mode                |
@@ -84,5 +84,73 @@ This ROS Python node (`drive_arc`) enables **manual and autonomous steering and 
 
 ## 🔧 Steer Function
 
-```python
-steer(initial_angles, final_angles, mode)
+
+---
+
+## 🛞 Steering Control Function (`steer`)
+
+The `steer(self, initial_angles, final_angles, mode)` function is responsible for rotating the steering motors of all four wheels to the desired angles using **closed-loop feedback** from encoders.
+
+---
+
+### 🧩 How It Works
+
+**Inputs:**
+
+- `initial_angles`: List of current encoder angles for each wheel
+- `final_angles`: List of target angles (absolute or relative)
+- `mode`:  
+  - `0` → Relative Mode (offset from current)  
+  - `1` → Absolute Mode (go to specific angle)
+
+---
+
+### 🔁 Process
+
+1. For each wheel:
+   - Compute `error = final_angle - current_angle`
+   - Apply **proportional control**: `PWM = kp_steer * error`
+   - Cap `PWM` to `max_steer_pwm` (to prevent overdrive)
+
+2. Loop at 10 Hz:
+   - Update encoder readings
+   - Recalculate PWM commands
+   - Check if all errors are below `error_thresh`
+   - Exit when either all targets are met or timeout is hit
+
+---
+
+### 🧮 Modes Explained
+
+#### 🌀 Relative Mode (`mode == 0`):
+Each wheel rotates by an angle **relative** to its current position.
+
+> Example:  
+> `final_angles = [45, 45, 45, 45]`  
+> → All wheels rotate +45° from where they are.
+
+#### 🎯 Absolute Mode (`mode == 1`):
+Each wheel rotates to an **absolute** target angle.
+
+> Example:  
+> `final_angles = [0, 90, 0, 90]`  
+> → Wheels go to those exact angles (in degrees or encoder ticks).
+
+---
+
+### ⚙️ Flow of Control
+
+```text
+joyCallback
+    ↓
+encoderCallback
+    ↓
+MAIN
+    ↓
+STEERING is called
+    ↓
+STEER is called
+    ↓
+DRIVE is called
+    ↓
+PWM Message is published
