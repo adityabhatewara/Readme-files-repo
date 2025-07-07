@@ -28,14 +28,14 @@ This code basically tells the rover how to understand the commands given via the
 ### Joystick: 
 
 This code has been made keeping in mind the following joystick/controller for controlling the rover:   
-![Controller_Image](ControllerLegend.jpeg)  
+![Controller_Image](controller_image.png)  
 We get the inputs from the joystick from the “/joy” topic, which is established by the joy.launch file.   
 In the code, the various buttons and axes are referenced by the following constants:
 
 | Variable Name | Value | Significance |
 | :---- | :---- | :---- |
-| self.mode\_up\_button | 7 | Cycles up the modes (0 \- 4\) |
-| self.mode\_down\_button | 6 | Cycles down the modes (4 \- 0\) |
+| self.modeupbtn | 7 | Cycles up the modes (0 \- 4\) |
+| self.modednbtn | 6 | Cycles down the modes (4 \- 0\) |
 | self.fb\_axis | 1 | Forward-backward motion while driving |
 | self.lr\_axis | 2 | Left-Right motion while driving  |
 | self.forward\_btn | 4 | Aligns all the wheels parallel to chassis |
@@ -56,7 +56,7 @@ In the code, the various buttons and axes are referenced by the following consta
 
 This is the main foundation of the code. It subdivides the rover controlling problem into three different conditions: 
 
-- Steering and Full Potential are both locked  
+- Steering and Full Potential are both locked (Locked Steering) 
 - Steering is unlocked  
 - Full Potential is unlocked
 
